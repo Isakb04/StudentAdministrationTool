@@ -15,7 +15,7 @@ This project is designed to manage and manipulate student and module data for ed
 - `modules.json`: JSON file containing initial data about modules.
 
 ## Getting Started
-To get started with this project, clone the repository and ensure you have Haskell installed on your machine. You can run the program by executing the `BS2220FunctionalPogramming.hs` file which will prompt you through the available operations.
+To get started with this project, clone the repository and ensure you have Haskell installed on your machine. You can run the program by executing the `stack ghci BS2220FunctionalPogramming.hs` file in your chosen command line.
 
 ## How to Contribute
 Contributors can help by improving the existing functionalities, adding new features, or documenting the code. Please ensure to follow the existing coding style and add comments where necessary.
@@ -26,10 +26,8 @@ This project uses simple file-based versioning for tracking changes in data file
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Authors
-- **John Doe** - *Initial work*
+## Author
+- Isak Jonsson 
 
 ## Acknowledgments
-- Hat tip to anyone whose code was used
-- Inspiration
-- etc
+- Reuben Shaw
