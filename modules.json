@@ -1,0 +1,72 @@
+[
+  {
+    "moduleId": 101,
+    "moduleName": "Math",
+    "enrolledStudents": 100
+  },
+  {
+    "moduleId": 102,
+    "moduleName": "Science",
+    "enrolledStudents": 200
+  },
+  {
+    "moduleId": 103,
+    "moduleName": "English",
+    "enrolledStudents": 150
+  },
+  {
+    "moduleId": 104,
+    "moduleName": "History",
+    "enrolledStudents": 120
+  },
+  {
+    "moduleId": 105,
+    "moduleName": "Geography",
+    "enrolledStudents": 90
+  },
+  {
+    "moduleId": 106,
+    "moduleName": "Art",
+    "enrolledStudents": 80
+  },
+  {
+    "moduleId": 107,
+    "moduleName": "Music",
+    "enrolledStudents": 70
+  },
+  {
+    "moduleId": 108,
+    "moduleName": "PE",
+    "enrolledStudents": 60
+  },
+  {
+    "moduleId": 109,
+    "moduleName": "Drama",
+    "enrolledStudents": 50
+  },
+  {
+    "moduleId": 110,
+    "moduleName": "IT",
+    "enrolledStudents": 40
+  },
+  {
+    "moduleId": 111,
+    "moduleName": "Business",
+    "enrolledStudents": 30
+  },
+  {
+    "moduleId": 112,
+    "moduleName": "Economics",
+    "enrolledStudents": 20
+  },
+  {
+    "moduleId": 113,
+    "moduleName": "Politics",
+    "enrolledStudents": 10
+  },
+  {
+    "moduleId": 114,
+    "moduleName": "Psychology",
+    "enrolledStudents": 5
+  }
+]

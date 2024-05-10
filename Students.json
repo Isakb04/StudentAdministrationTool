@@ -1,0 +1,32 @@
+[
+    {
+        "studentId": 1,
+        "firstName": "John",
+        "lastName": "Doe",
+        "enrolledModules": [101, 102, 103]
+    },
+    {
+        "studentId": 2,
+        "firstName": "Jane",
+        "lastName": "Smith",
+        "enrolledModules": [101, 104, 105]
+    },
+    {
+        "studentId": 3,
+        "firstName": "Alice",
+        "lastName": "Johnson",
+        "enrolledModules": [102, 103, 106]
+    },
+    {
+        "studentId": 4,
+        "firstName": "Bob",
+        "lastName": "Brown",
+        "enrolledModules": [101, 106, 107]
+    },
+    {
+        "studentId": 5,
+        "firstName": "Emily",
+        "lastName": "White",
+        "enrolledModules": [102, 104, 108]
+    }
+]
