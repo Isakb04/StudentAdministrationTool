@@ -22,11 +22,11 @@ module Main (
     main
 ) where
 
-
-
 import qualified Data.ByteString.Lazy as B
 import Data.Aeson (FromJSON, ToJSON, eitherDecode, encode)
+import Data.Aeson.Encode.Pretty (encodePretty)
 import GHC.Generics (Generic)
+
 -- Define the main function
 main :: IO ()
 main = do
@@ -62,7 +62,7 @@ loadModules = do
     return $ eitherDecode moduleData
 
 saveStudents :: [Student] -> IO ()
-saveStudents students = B.writeFile studentFile (encode students)
+saveStudents students = B.writeFile studentFile (encodePretty students)
 
 saveModules :: [Module] -> IO ()
 saveModules modules = B.writeFile moduleFile (encode modules)
