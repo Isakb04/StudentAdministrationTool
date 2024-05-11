@@ -23,7 +23,7 @@ module Main (
 ) where
 
 import qualified Data.ByteString.Lazy as B
-import Data.Aeson (FromJSON, ToJSON, eitherDecode, encode)
+import Data.Aeson (FromJSON, ToJSON, eitherDecode)
 import Data.Aeson.Encode.Pretty (encodePretty)
 import GHC.Generics (Generic)
 
@@ -43,7 +43,7 @@ data Module = Module
     { moduleId :: Int
     , moduleName :: String
     , enrolledStudents :: Int
-    } deriving (Show, Eq, ToJSON, FromJSON, Generic)    
+    } deriving (Show, Eq, ToJSON, FromJSON, Generic)
 
 studentFile :: FilePath
 studentFile = "students.json"
@@ -65,7 +65,7 @@ saveStudents :: [Student] -> IO ()
 saveStudents students = B.writeFile studentFile (encodePretty students)
 
 saveModules :: [Module] -> IO ()
-saveModules modules = B.writeFile moduleFile (encode modules)
+saveModules modules = B.writeFile moduleFile (encodePretty modules)
 
 help :: IO ()
 help = do

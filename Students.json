@@ -1,1 +1,52 @@
-[{"enrolledModules":[101,102,103],"firstName":"John","lastName":"Doe","studentId":1},{"enrolledModules":[101,104,105],"firstName":"Jane","lastName":"Smith","studentId":2},{"enrolledModules":[102,103,106],"firstName":"Alice","lastName":"Johnson","studentId":3},{"enrolledModules":[101,106,107],"firstName":"Bob","lastName":"Brown","studentId":4},{"enrolledModules":[102,104,108],"firstName":"Emily","lastName":"White","studentId":5}]
+[
+    {
+        "enrolledModules": [
+            101,
+            102,
+            103
+        ],
+        "firstName": "John",
+        "lastName": "Doe",
+        "studentId": 1
+    },
+    {
+        "enrolledModules": [
+            101,
+            104,
+            105
+        ],
+        "firstName": "Jane",
+        "lastName": "Smith",
+        "studentId": 2
+    },
+    {
+        "enrolledModules": [
+            102,
+            103,
+            106
+        ],
+        "firstName": "Alice",
+        "lastName": "Johnson",
+        "studentId": 3
+    },
+    {
+        "enrolledModules": [
+            101,
+            106,
+            107
+        ],
+        "firstName": "Bob",
+        "lastName": "Brown",
+        "studentId": 4
+    },
+    {
+        "enrolledModules": [
+            102,
+            104,
+            108
+        ],
+        "firstName": "Emily",
+        "lastName": "White",
+        "studentId": 5
+    }
+]

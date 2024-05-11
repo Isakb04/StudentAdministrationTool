@@ -1,5 +1,5 @@
-# Stack workspace
+# hide stack workspace
 .stack-work/
-# Hidden directory for VSCode
+# Hide .VSCode
 .vscode/
 *~
