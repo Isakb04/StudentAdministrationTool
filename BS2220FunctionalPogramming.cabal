@@ -34,7 +34,8 @@ library
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      aeson
+      HUnit
+    , aeson
     , aeson-pretty
     , base >=4.7 && <5
     , bytestring
@@ -51,6 +52,7 @@ executable BS2220FunctionalPogramming-exe
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       BS2220FunctionalPogramming
+    , HUnit
     , aeson
     , aeson-pretty
     , base >=4.7 && <5
@@ -69,6 +71,7 @@ test-suite BS2220FunctionalPogramming-test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       BS2220FunctionalPogramming
+    , HUnit
     , aeson
     , aeson-pretty
     , base >=4.7 && <5

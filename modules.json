@@ -1,67 +1,93 @@
 [
     {
-        "enrolledStudents": 20,
+        "enrolledStudents": [],
+        "moduleId": 117,
+        "moduleName": "psychology"
+    },
+    {
+        "enrolledStudents": [],
+        "moduleId": 116,
+        "moduleName": "Test"
+    },
+    {
+        "enrolledStudents": [],
         "moduleId": 115,
         "moduleName": "Music"
     },
     {
-        "enrolledStudents": 100,
+        "enrolledStudents": [
+            1,
+            2,
+            4
+        ],
         "moduleId": 101,
         "moduleName": "Math"
     },
     {
-        "enrolledStudents": 200,
+        "enrolledStudents": [
+            1,
+            3,
+            5
+        ],
         "moduleId": 102,
         "moduleName": "Science"
     },
     {
-        "enrolledStudents": 150,
+        "enrolledStudents": [
+            1,
+            3
+        ],
         "moduleId": 103,
         "moduleName": "English"
     },
     {
-        "enrolledStudents": 120,
+        "enrolledStudents": [
+            2,
+            5
+        ],
         "moduleId": 104,
         "moduleName": "History"
     },
     {
-        "enrolledStudents": 90,
+        "enrolledStudents": [
+            2
+        ],
         "moduleId": 105,
         "moduleName": "Geography"
     },
     {
-        "enrolledStudents": 80,
+        "enrolledStudents": [
+            3,
+            4
+        ],
         "moduleId": 106,
         "moduleName": "Art"
     },
     {
-        "enrolledStudents": 60,
+        "enrolledStudents": [
+            5
+        ],
         "moduleId": 108,
         "moduleName": "PE"
     },
     {
-        "enrolledStudents": 50,
+        "enrolledStudents": [],
         "moduleId": 109,
         "moduleName": "Drama"
     },
     {
-        "enrolledStudents": 40,
+        "enrolledStudents": [],
         "moduleId": 110,
         "moduleName": "IT"
     },
     {
-        "enrolledStudents": 30,
+        "enrolledStudents": [],
         "moduleId": 111,
         "moduleName": "Business"
     },
     {
-        "enrolledStudents": 20,
+        "enrolledStudents": [],
         "moduleId": 112,
         "moduleName": "Economics"
-    },
-    {
-        "enrolledStudents": 5,
-        "moduleId": 114,
-        "moduleName": "Psychology"
     }
 ]

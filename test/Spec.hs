@@ -1,6 +1,21 @@
 import Test.HUnit
 import Lib
 
+
+-- Main function to run all tests
+main :: IO Counts
+main = runTestTT $ TestList [
+    testLoadStudents,
+    testLoadModules,
+    testFindStudentByFirstName,
+    testFindModuleByName,
+    testAddStudent,
+    testRemoveStudent,
+    testExportStudents,
+    testExportModules,
+    testUpdateStudent
+    ]
+
 -- Test for loading students
 testLoadStudents :: Test
 testLoadStudents = TestCase $ do
@@ -55,7 +70,10 @@ testExportModules = TestCase $ do
     result <- exportModules modules
     assertEqual "Should export data correctly" "Export successful" result
 
--- Main function to run all tests
-main :: IO Counts
-main = runTestTT $ TestList [testLoadStudents, testLoadModules, testFindStudentByFirstName, testFindModuleByName, testAddStudent, testRemoveStudent, testExportStudents]
-
+-- Test for updating a student's details
+testUpdateStudent :: Test
+testUpdateStudent = TestCase $ do
+    let students = [Student 1 "John" "Doe" [101], Student 2 "Jane" "Doe" [102]]
+    let updatedStudent = Student 1 "John" "Smith" [101, 103]
+    let result = updateStudent 1 updatedStudent students
+    assertEqual "Should update the student correctly" [updatedStudent, Student 2 "Jane" "Doe" [102]] result

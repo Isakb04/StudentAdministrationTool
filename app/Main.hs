@@ -27,6 +27,7 @@ import Data.Aeson (FromJSON, ToJSON, eitherDecode)
 import Data.Aeson.Encode.Pretty (encodePretty)
 import GHC.Generics (Generic)
 
+
 -- Define the main function
 main :: IO ()
 main = do
@@ -42,7 +43,7 @@ data Student = Student
 data Module = Module
     { moduleId :: Int
     , moduleName :: String
-    , enrolledStudents :: Int
+    , enrolledStudents :: [Int]  
     } deriving (Show, Eq, ToJSON, FromJSON, Generic)
 
 studentFile :: FilePath
@@ -77,6 +78,7 @@ help = do
     putStrLn "        findModuleById: Find a module by ID"
     putStrLn "                   add: Add a student or module"
     putStrLn "                remove: Remove a student or module"
+    putStrLn "                  export: Export the students or modules"
     putStrLn "                   :q : Exit the program"
 
 
@@ -137,8 +139,12 @@ add = do
     entityType <- getLine
     case entityType of
         "Student" -> StudentAdded <$> addStudent
+        "student" -> StudentAdded <$> addStudent
         "Module" -> ModuleAdded <$> addModule
-        _ -> return $ StudentAdded $ Left "Invalid entity type. Please type 'Student' or 'Module'"
+        "module" -> ModuleAdded <$> addModule
+        _ -> do
+            putStrLn "Invalid entity type. Please type 'Student' or 'Module'"
+            return $ StudentAdded $ Left "Invalid entity type. Please type 'Student' or 'Module'"
 
 addStudent :: IO (Either String [Student])
 addStudent = do
@@ -148,43 +154,70 @@ addStudent = do
     lName <- getLine
     putStrLn "Enter the enrolled modules (comma-separated module IDs):"
     modulesInput <- getLine
-    let modules = map read $ words $ map (\c -> if c == ',' then ' ' else c) modulesInput
+    let moduleIds = map read $ words $ map (\c -> if c == ',' then ' ' else c) modulesInput  -- Convert comma-separated string to list of Ints
+    eitherModules <- loadModules
     eitherStudents <- loadStudents
-    case eitherStudents of
-        Left err -> return $ Left err
-        Right students -> do
-            let newId = if null students then 1 else 1 + maximum (map studentId students)
-            let newStudent = Student newId fName lName modules
-            putStrLn "Are you sure you want to add this student? (Y/N)"
-            confirmation <- getLine
-            if confirmation == "Y" || confirmation == "y"
+    case (eitherModules, eitherStudents) of
+        (Left modErr, _) -> do
+            putStrLn "Failed to load modules."
+            return $ Left modErr
+        (_, Left studErr) -> do
+            putStrLn "Failed to load students."
+            return $ Left studErr
+        (Right modules, Right students) -> do
+            let validModuleIds = map moduleId modules
+            putStrLn $ "Valid module IDs: " ++ show validModuleIds  -- Debug statement
+            putStrLn $ "Provided module IDs: " ++ show moduleIds  -- Debug statement
+            let areAllValid = all (`elem` validModuleIds) moduleIds
+            if not areAllValid
                 then do
-                    let updatedStudents = newStudent : students
-                    saveStudents updatedStudents  -- Save the updated list to the JSON file
-                    return $ Right updatedStudents
-                else return $ Left "Addition cancelled."
-
+                    putStrLn "One or more module IDs are invalid."
+                    return $ Left "One or more module IDs are invalid."
+                else do
+                    let newId = if null students then 1 else 1 + maximum (map studentId students)
+                    let newStudent = Student newId fName lName moduleIds
+                    putStrLn "Are you sure you want to add this student? (Y/N)"
+                    confirmation <- getLine
+                    if confirmation == "Y" || confirmation == "y"
+                        then do
+                            let updatedModules = map (\m -> if moduleId m `elem` moduleIds then m { enrolledStudents = studentId newStudent : enrolledStudents m } else m) modules
+                            let updatedStudents = newStudent : students
+                            saveStudents updatedStudents  -- Save the updated list to the JSON file
+                            saveModules updatedModules  -- Save the updated modules to the JSON file
+                            return $ Right updatedStudents
+                        else do
+                            putStrLn "Addition cancelled."
+                            return $ Left "Addition cancelled."
+                            
 addModule :: IO (Either String [Module])
 addModule = do
     putStrLn "Enter the name of the module:"
     mName <- getLine
-    putStrLn "Enter the number of enrolled students:"
-    studentsInput <- getLine
-    let students = read studentsInput :: Int  -- Correctly read the number of students as an Int
     eitherModules <- loadModules
-    case eitherModules of
-        Left err -> return $ Left err
-        Right modules -> do
-            let newId = if null modules then 1 else 1 + maximum (map moduleId modules)
-            let newModule = Module newId mName students
-            putStrLn "Are you sure you want to add this module? (Y/N)"
-            confirmation <- getLine
-            if confirmation == "Y" || confirmation == "y"
-                then do
-                    let updatedModules = newModule : modules
-                    saveModules updatedModules  -- Save the updated list to the JSON file
-                    return $ Right updatedModules
-                else return $ Left "Addition cancelled."
+    eitherStudents <- loadStudents
+    case (eitherModules, eitherStudents) of
+        (Left modErr, _) -> return $ Left modErr
+        (_, Left studErr) -> return $ Left studErr
+        (Right modules, Right students) -> do
+            if any (\m -> moduleName m == mName) modules
+                then do 
+                    putStrLn "Module already exists."
+                    return $ Left "Module already exists."
+                else do
+                    let newId = if null modules then 1 else 1 + maximum (map moduleId modules)
+                    let studentIds = [studentId s | s <- students, newId `elem` enrolledModules s]
+                    let newModule = Module newId mName studentIds
+                    putStrLn "Are you sure you want to add this module? (Y/N)"
+                    confirmation <- getLine
+                    if confirmation == "Y" || confirmation == "y"
+                        then do
+                            let updatedModules = newModule : modules
+                            saveModules updatedModules  -- Save the updated list to the JSON file
+                            return $ Right updatedModules
+                        else do
+                            putStrLn "Addition cancelled."  -- Ensure this gets printed
+                            return $ Left "Addition cancelled."
+
 
 data RemovalResult = StudentRemoval (Either String [Student]) | ModuleRemoval (Either String [Module])
 
@@ -194,53 +227,73 @@ remove = do
     entityType <- getLine
     case entityType of
         "Student" -> StudentRemoval <$> removeStudent
+        "student" -> StudentRemoval <$> removeStudent
         "Module" -> ModuleRemoval <$> removeModule
-        _ -> return $ StudentRemoval $ Left "Invalid entity type. Please type 'Student' or 'Module'"
+        "module" -> ModuleRemoval <$> removeModule
+        _ -> do
+            putStrLn "Invalid entity type. Please type 'Student' or 'Module'"
+            return $ StudentRemoval $ Left "Invalid entity type. Please type 'Student' or 'Module'"
 
 removeStudent :: IO (Either String [Student])
 removeStudent = do
-    putStrLn "Enter the first name of the student:"
-    fName <- getLine
-    putStrLn "Enter the last name of the student:"
-    lName <- getLine
+    putStrLn "Enter the first and last name of the student or just the student ID:"
+    input <- getLine
     eitherStudents <- loadStudents
-    case eitherStudents of
-        Left err -> return $ Left err
-        Right students -> do
-            let filteredStudents = filter (\s -> firstName s == fName && lastName s == lName) students
+    eitherModules <- loadModules
+    case (eitherStudents, eitherModules) of
+        (Left err, _) -> return $ Left err
+        (_, Left err) -> return $ Left err
+        (Right students, Right modules) -> do
+            let filteredStudents = filter (\s -> (firstName s ++ " " ++ lastName s == input) || show (studentId s) == input) students
             if null filteredStudents
-                then return $ Left "No student found with given name"
+                then do 
+                    putStrLn "No student found with given name or ID"
+                    return $ Left "No student found with given name or ID"
                 else do
                     putStrLn "Are you sure you want to remove this student? (Y/N)"
                     confirmation <- getLine
                     if confirmation == "Y" || confirmation == "y"
                     then do 
-                        let updatedStudents = filter (\s -> not (firstName s == fName && lastName s == lName)) students
+                        let studentToRemove = head filteredStudents
+                        let updatedStudents = filter (/= studentToRemove) students
+                        let updatedModules = map (\m -> m { enrolledStudents = filter (/= studentId studentToRemove) (enrolledStudents m) }) modules
                         saveStudents updatedStudents  -- Save the updated list to the JSON file
+                        saveModules updatedModules  -- Update the modules JSON file
                         return $ Right updatedStudents
-                    else return $ Left "Removal cancelled."
+                    else do
+                        putStrLn "Removal cancelled."
+                        return $ Left "Removal cancelled."
                         
 
 removeModule :: IO (Either String [Module])
 removeModule = do
-    putStrLn "Enter the name of the module:"
-    mName <- getLine
+    putStrLn "Enter the name or ID of the module:"
+    input <- getLine
     eitherModules <- loadModules
-    case eitherModules of
-        Left err -> return $ Left err
-        Right modules -> do
-            let filteredModules = filter (\m -> moduleName m == mName) modules
+    eitherStudents <- loadStudents
+    case (eitherModules, eitherStudents) of
+        (Left err, _) -> return $ Left err
+        (_, Left err) -> return $ Left err
+        (Right modules, Right students) -> do
+            let filteredModules = filter (\m -> moduleName m == input || show (moduleId m) == input) modules
             if null filteredModules
-                then return $ Left "No module found with given name"
+                then do
+                    putStrLn "No module found with given name or ID"
+                    return $ Left "No module found with given name or ID"
                 else do
                     putStrLn "Are you sure you want to remove this module? (Y/N)"
                     confirmation <- getLine
                     if confirmation == "Y" || confirmation == "y"
                     then do 
-                        let updatedModules = filter (\m -> not (moduleName m == mName)) modules
+                        let moduleToRemove = head filteredModules
+                        let updatedModules = filter (/= moduleToRemove) modules
+                        let updatedStudents = map (\s -> s { enrolledModules = filter (/= moduleId moduleToRemove) (enrolledModules s) }) students
                         saveModules updatedModules  -- Save the updated list to the JSON file
+                        saveStudents updatedStudents  -- Update the students JSON file
                         return $ Right updatedModules
-                    else return $ Left "Removal cancelled."
+                    else do
+                        putStrLn "Removal cancelled."
+                        return $ Left "Removal cancelled."
 
 data ExportResult = StudentsExported | ModulesExported | Error String
 
@@ -251,7 +304,9 @@ export = do
     case entityType of
         "Students" -> return StudentsExported
         "Modules" -> return ModulesExported
-        _ -> return $ Error "Invalid entity type. Please type 'Students' or 'Modules'"
+        _ -> do
+            putStrLn "Invalid entity type. Please type 'Students' or 'Modules'"
+            return $ Error "Invalid entity type. Please type 'Students' or 'Modules'"
         
 exportStudents :: IO ()
 exportStudents = do
