@@ -1,13 +1,18 @@
 [
     {
         "enrolledStudents": [],
-        "moduleId": 117,
-        "moduleName": "psychology"
+        "moduleId": 119,
+        "moduleName": "Test"
     },
     {
         "enrolledStudents": [],
-        "moduleId": 116,
-        "moduleName": "Test"
+        "moduleId": 118,
+        "moduleName": "History"
+    },
+    {
+        "enrolledStudents": [],
+        "moduleId": 117,
+        "moduleName": "psychology"
     },
     {
         "enrolledStudents": [],
@@ -25,6 +30,7 @@
     },
     {
         "enrolledStudents": [
+            12,
             1,
             3,
             5
@@ -34,19 +40,12 @@
     },
     {
         "enrolledStudents": [
+            13,
             1,
             3
         ],
         "moduleId": 103,
         "moduleName": "English"
-    },
-    {
-        "enrolledStudents": [
-            2,
-            5
-        ],
-        "moduleId": 104,
-        "moduleName": "History"
     },
     {
         "enrolledStudents": [
@@ -84,10 +83,5 @@
         "enrolledStudents": [],
         "moduleId": 111,
         "moduleName": "Business"
-    },
-    {
-        "enrolledStudents": [],
-        "moduleId": 112,
-        "moduleName": "Economics"
     }
 ]

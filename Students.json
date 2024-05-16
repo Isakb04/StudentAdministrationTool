@@ -1,6 +1,64 @@
 [
     {
         "enrolledModules": [
+            103
+        ],
+        "firstName": "Jon",
+        "lastName": "Clark",
+        "studentId": 13
+    },
+    {
+        "enrolledModules": [
+            102
+        ],
+        "firstName": "Jon",
+        "lastName": "Bjarni",
+        "studentId": 12
+    },
+    {
+        "enrolledModules": [],
+        "firstName": "p",
+        "lastName": "p",
+        "studentId": 11
+    },
+    {
+        "enrolledModules": [
+            111
+        ],
+        "firstName": "k",
+        "lastName": "k",
+        "studentId": 10
+    },
+    {
+        "enrolledModules": [
+            111
+        ],
+        "firstName": "ui",
+        "lastName": "iu",
+        "studentId": 9
+    },
+    {
+        "enrolledModules": [
+            111
+        ],
+        "firstName": "wqe",
+        "lastName": "qwe",
+        "studentId": 8
+    },
+    {
+        "enrolledModules": [],
+        "firstName": "eqw",
+        "lastName": "weq",
+        "studentId": 7
+    },
+    {
+        "enrolledModules": [],
+        "firstName": "Lucy",
+        "lastName": "Gliddon",
+        "studentId": 6
+    },
+    {
+        "enrolledModules": [
             101,
             102,
             103
@@ -12,7 +70,6 @@
     {
         "enrolledModules": [
             101,
-            104,
             105
         ],
         "firstName": "Jane",
@@ -42,7 +99,6 @@
     {
         "enrolledModules": [
             102,
-            104,
             108
         ],
         "firstName": "Emily",
