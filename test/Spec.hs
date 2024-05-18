@@ -1,79 +1,95 @@
 import Test.HUnit
 import Lib
+import System.Directory
 
-
--- Main function to run all tests
-main :: IO Counts
-main = runTestTT $ TestList [
-    testLoadStudents,
-    testLoadModules,
-    testFindStudentByFirstName,
-    testFindModuleByName,
-    testAddStudent,
-    testRemoveStudent,
-    testExportStudents,
-    testExportModules,
-    testUpdateStudent
+tests :: [Test]
+tests = 
+    [ testFindStudentByFirstName
+   , testFindStudentByLastName
+   , testFindStudentById
+   , testFindModuleByName
+   , testFindModuleById
+   , testAddStudent
+   , testAddModule
+   , testRemoveStudent
+   , testRemoveModule
+   , testExportStudents
+   , testExportModules
     ]
 
--- Test for loading students
-testLoadStudents :: Test
-testLoadStudents = TestCase $ do
-    result <- loadStudents
-    assertEqual "Should load students correctly" (Right [Student 1 "John" "Doe" [101, 102]]) result
-
--- Test for loading modules
-testLoadModules :: Test
-testLoadModules = TestCase $ do
-    result <- loadModules
-    assertEqual "Should load modules correctly" (Right [Module 101 "Mathematics" 10, Module 102 "Physics" 8]) result
-
--- Test for finding students by first name
 testFindStudentByFirstName :: Test
 testFindStudentByFirstName = TestCase $ do
-    let students = Right [Student 1 "John" "Doe" [101], Student 2 "Jane" "Doe" [102]]
-    let result = findStudentByFirstName "John" students
-    assertEqual "Should find students by first name" (Right [Student 1 "John" "Doe" [101]]) result
+    let students = [Student 1 "Test Alice" "Smith" [101, 102, 103], Student 2 "Test Bob" "Johnson" [101, 105]]
+    assertEqual "Should find student by first name" [Student 1 "Test Alice" "Smith" [101, 102, 103]] (findStudentByFirstName "Test Alice" students)
 
--- Test for finding modules by name
+testFindStudentByLastName :: Test
+testFindStudentByLastName = TestCase $ do
+    let students = [Student 1 "Test Alice" "Smith" [101, 102, 103], Student 2 "Test Bob" "Johnson" [101, 105]]
+    assertEqual "Should find student by last name" [Student 2 "Test Bob" "Johnson" [101, 105]] (findStudentByLastName "Johnson" students)
+
+testFindStudentById :: Test
+testFindStudentById = TestCase $ do
+    let students = [Student 1 "Test Alice" "Smith" [101, 102, 103], Student 2 "Test Bob" "Johnson" [101, 105]]
+    assertEqual "Should find student by ID" (Just (Student 1 "Test Alice" "Smith" [101, 102, 103])) (findStudentById 1 students)
+
 testFindModuleByName :: Test
 testFindModuleByName = TestCase $ do
-    let modules = Right [Module 101 "Mathematics" 10, Module 102 "Physics" 8]
-    let result = findModuleByName "Physics" modules
-    assertEqual "Should find modules by name" (Right [Module 102 "Physics" 8]) result
+    let modules = [Module 101 "Test1" [101, 102, 103, 105], Module 102 "Test2" [101, 102, 103, 105]]
+    assertEqual "Should find module by name" (Just (Module 101 "Test1" [101, 102, 103, 105])) (findModuleByName "Test1" modules)
 
--- Test for adding a new student
+testFindModuleById :: Test
+testFindModuleById = TestCase $ do
+    let modules = [Module 101 "Test1" [101, 102, 103, 105], Module 102 "Test2" [101, 102, 103, 105]]
+    assertEqual "Should find module by ID" (Just (Module 101 "Test1" [101, 102, 103, 105])) (findModuleById 101 modules)
+
 testAddStudent :: Test
 testAddStudent = TestCase $ do
-    let students = [Student 1 "John" "Doe" [101]]
-    let newStudent = Student 2 "Jane" "Doe" [102]
-    let result = addStudent newStudent students
-    assertBool "Should contain the new student" (newStudent `elem` result)
+    let initialStudents = []
+    let initialModules = [Module 101 "Test1" [], Module 102 "Test2" []]
+    result <- addStudent "Test Alice" "Smith" [101, 102] initialStudents initialModules
+    assertEqual "Should add a new student" (Right [Student 1 "Test Alice" "Smith" [101, 102]]) result
 
--- Test for removing a student
+testAddModule :: Test
+testAddModule = TestCase $ do
+    let initialModules = []
+    result <- addModule "Test1" initialModules
+    assertEqual "Should add a new module" (Right [Module 1 "Test1" []]) result
+
 testRemoveStudent :: Test
 testRemoveStudent = TestCase $ do
-    let students = [Student 1 "John" "Doe" [101], Student 2 "Jane" "Doe" [102]]
-    let result = removeStudent 1 students
-    assertEqual "Should remove the student correctly" [Student 2 "Jane" "Doe" [102]] result
+    let students = [Student 1 "Test Alice" "Smith" [101, 102], Student 2 "Test Bob" "Johnson" [103]]
+    let modules = [Module 101 "Test1" [], Module 102 "Test2" [], Module 103 "Test3" []]
+    result <- removeStudent 1 students modules
+    assertEqual "Should remove a student" (Right ([Student 2 "Test Bob" "Johnson" [103]], modules)) result
 
--- Test for exporting students
+testRemoveModule :: Test
+testRemoveModule = TestCase $ do
+    let modules = [Module 1 "Test1" [], Module 2 "Test2" []]
+    let students = []
+    result <- removeModule 1 modules students
+    assertEqual "Should remove a module" (Right ([Module 2 "Test2" []], [])) result
+
 testExportStudents :: Test
 testExportStudents = TestCase $ do
-    let students = [Student 1 "John" "Doe" [101]]
-    result <- exportStudents students
-    assertEqual "Should export data correctly" "Export successful" result
+    let students = [Student 1 "Test Alice" " Smith" [101, 102], Student 2 "Test Bob" "Johnson" [103]]
+    exportStudents students
+    fileExists <- System.Directory.doesFileExist "students_list.txt"
+    assertEqual "Should export students" True fileExists
+    removeFile "students_list.txt"
+    fileExistsAfterRemoval <- System.Directory.doesFileExist "students_list.txt"
+    assertEqual "Should remove students file after testing." False fileExistsAfterRemoval
 
 testExportModules :: Test
 testExportModules = TestCase $ do
-    let modules = [Module 101 "Mathematics" 10, Module 102 "Physics" 8]
-    result <- exportModules modules
-    assertEqual "Should export data correctly" "Export successful" result
+    let modules = [Module 1 "Test1" [], Module 2 "Test2" []]
+    exportModules modules
+    fileExists <- System.Directory.doesFileExist "modules_list.txt"
+    assertEqual "Should export modules" True fileExists
+    removeFile "modules_list.txt"
+    fileExistsAfterRemoval <- System.Directory.doesFileExist "modules_list.txt"
+    assertEqual "Should remove modules file after testing." False fileExistsAfterRemoval
 
--- Test for updating a student's details
-testUpdateStudent :: Test
-testUpdateStudent = TestCase $ do
-    let students = [Student 1 "John" "Doe" [101], Student 2 "Jane" "Doe" [102]]
-    let updatedStudent = Student 1 "John" "Smith" [101, 103]
-    let result = updateStudent 1 updatedStudent students
-    assertEqual "Should update the student correctly" [updatedStudent, Student 2 "Jane" "Doe" [102]] result
+main :: IO ()
+main = do
+    _ <- runTestTT $ TestList tests
+    return ()

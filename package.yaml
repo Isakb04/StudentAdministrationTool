@@ -25,6 +25,7 @@ dependencies:
 - bytestring
 - aeson-pretty
 - HUnit
+- directory
 
 ghc-options:
 - -Wall
