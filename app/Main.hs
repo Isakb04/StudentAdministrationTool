@@ -10,18 +10,20 @@ module Main (
     config  -- Export config function
 ) where
 
+-- Import necessary modules
 import Lib
 import Data.Maybe (maybeToList)
 import Data.Char (toUpper)
 import System.Environment()
 
+-- Main function
 main :: IO ()
 main = do
     putStrLn "[Student and Module Management System!]"
     commandSystem
     return ()
 
-
+-- Command system
 commandSystem :: IO ()
 commandSystem = do
     putStrLn ""
@@ -51,6 +53,7 @@ commandSystem = do
             putStrLn "Invalid command. Please try again."
             commandSystem
 
+-- Help function
 help :: IO ()
 help = do
     putStrLn "               [Commands]"
@@ -68,7 +71,7 @@ help = do
     putStrLn "          :q : Exit"
     putStrLn ""
     
-
+-- Add a new student or module
 add :: IO ()
 add = do
     putStrLn "[add new student or module]"
@@ -119,7 +122,7 @@ add = do
             putStrLn "Invalid arguments. Please refer to the README or help command."
             
 
-
+-- Remove a student or module
 remove :: IO ()
 remove = do
     putStrLn "[remove student or module]"
@@ -169,7 +172,7 @@ remove = do
             putStrLn "Invalid arguments. Please refer to the README or help command."
             
 
-
+-- Add or remove a student from a module
 config :: IO ()
 config = do
     putStrLn "[add or remove student from module]"
@@ -222,6 +225,7 @@ config = do
         _ -> do
             putStrLn "Invalid arguments. Please refer to the README or help command."
 
+-- Find a student
 findStudent :: IO ()
 findStudent = do
     putStrLn "[Find Student]"
@@ -243,6 +247,7 @@ findStudent = do
             mapM_ (putStrLn . show) foundById
         Left err -> putStrLn err
 
+-- Find a module
 findModule :: IO ()
 findModule = do
     putStrLn "[Find Module]"
@@ -260,6 +265,7 @@ findModule = do
             mapM_ (putStrLn . show) foundById
         Left err -> putStrLn err
 
+-- Export data
 exportData :: IO ()
 exportData = do
     putStrLn "[Export Data]"

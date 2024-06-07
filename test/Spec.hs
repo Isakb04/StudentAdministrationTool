@@ -21,6 +21,7 @@ tests =
     , testLoadModules
     ]
 
+-- Define the tests
 testLoadStudents :: Test
 testLoadStudents = TestCase $ do
     result <- loadStudents

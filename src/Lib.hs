@@ -24,6 +24,7 @@ module Lib (
     removeStudentFromModule
 ) where
 
+-- Import necessary modules
 import qualified Data.ByteString.Lazy as B
 import Data.Aeson (FromJSON, ToJSON, eitherDecode)
 import Data.Aeson.Encode.Pretty (encodePretty)
@@ -31,6 +32,7 @@ import GHC.Generics (Generic)
 import Data.List (find, delete)
 import System.Directory (createDirectoryIfMissing)
 
+-- Define the Student and Module data types
 data Student = Student
     { studentId :: Int
     , firstName :: String
@@ -44,12 +46,14 @@ data Module = Module
     , enrolledStudents :: [Int]  
     } deriving (Show, Eq, ToJSON, FromJSON, Generic)
 
+-- Define the file paths for the student and module data
 studentFile :: FilePath
 studentFile = "students.json"
 
 moduleFile :: FilePath
 moduleFile = "modules.json"
 
+-- Define functions to load and save student and module data
 loadStudents :: IO (Either String [Student])
 loadStudents = do
     studentData <- B.readFile studentFile
@@ -66,6 +70,7 @@ saveStudents students = B.writeFile studentFile (encodePretty students)
 saveModules :: [Module] -> IO ()
 saveModules modules = B.writeFile moduleFile (encodePretty modules)
 
+-- Define functions to find students and modules by various criteria
 findStudentByFirstName :: String -> [Student] -> [Student]
 findStudentByFirstName fName students = filter (\s -> firstName s == fName) students
 
@@ -81,6 +86,7 @@ findModuleByName mName modules = find (\m -> moduleName m == mName) modules
 findModuleById :: Int -> [Module] -> Maybe Module
 findModuleById mId modules = find (\m -> moduleId m == mId) modules
 
+-- Define functions to add and remove students and modules
 addStudent :: String -> String -> [Int] -> [Student] -> [Module] -> IO (Either String [Student])
 addStudent fName lName moduleIds students modules = do
     return $ if all (`elem` map moduleId modules) moduleIds then
@@ -101,6 +107,7 @@ addModule mName modules = do
         newId = if null modules then 1 else maximum (map moduleId modules) + 1
         newModule = Module newId mName []
 
+-- Define functions to remove students and modules
 removeStudent :: Int -> [Student] -> [Module] -> IO (Either String ([Student], [Module]))
 removeStudent sId students modules = do
     case findStudentById sId students of
@@ -117,6 +124,7 @@ removeModule mId modules students = do
     where
         updatedStudents = map (\s -> s { enrolledModules = filter (/= mId) (enrolledModules s) }) students
 
+-- Define functions to add and remove students from modules
 addStudentToModule :: Int -> Int -> [Student] -> [Module] -> IO (Either String ([Student], [Module]))
 addStudentToModule sId mId students modules = do
     case findStudentById sId students of
@@ -140,7 +148,8 @@ removeStudentFromModule sId mId students modules = do
     where
         updatedStudents = map (\s -> if studentId s == sId then s { enrolledModules = filter (/= mId) (enrolledModules s) } else s) students
         updatedModules = map (\m -> if moduleId m == mId then m { enrolledStudents = filter (/= sId) (enrolledStudents m) } else m) modules
-        
+
+-- Define functions to export student and module data        
 exportStudents :: [Student] -> IO ()
 exportStudents students = do
     let content = unlines $ map (\s -> "Student ID: " ++ show (studentId s) ++ ", Name: " ++ firstName s ++ " " ++ lastName s ++ ", Modules: " ++ show (enrolledModules s)) students
