@@ -5,17 +5,35 @@ import System.Directory
 tests :: [Test]
 tests = 
     [ testFindStudentByFirstName
-   , testFindStudentByLastName
-   , testFindStudentById
-   , testFindModuleByName
-   , testFindModuleById
-   , testAddStudent
-   , testAddModule
-   , testRemoveStudent
-   , testRemoveModule
-   , testExportStudents
-   , testExportModules
+    , testFindStudentByLastName
+    , testFindStudentById
+    , testFindModuleByName
+    , testFindModuleById
+    , testAddStudent
+    , testAddModule
+    , testRemoveStudent
+    , testRemoveModule
+    , testExportStudents
+    , testExportModules
+    , testAddStudentToModule
+    , testRemoveStudentFromModule
+    , testLoadStudents
+    , testLoadModules
     ]
+
+testLoadStudents :: Test
+testLoadStudents = TestCase $ do
+    result <- loadStudents
+    assertBool "Should load students.json" (case result of
+        Left _ -> False
+        Right _ -> True)
+
+testLoadModules :: Test
+testLoadModules = TestCase $ do
+    result <- loadModules
+    assertBool "Should load modules.json" (case result of
+        Left _ -> False
+        Right _ -> True)
 
 testFindStudentByFirstName :: Test
 testFindStudentByFirstName = TestCase $ do
@@ -73,21 +91,36 @@ testExportStudents :: Test
 testExportStudents = TestCase $ do
     let students = [Student 1 "Test Alice" " Smith" [101, 102], Student 2 "Test Bob" "Johnson" [103]]
     exportStudents students
-    fileExists <- System.Directory.doesFileExist "students_list.txt"
+    fileExists <- System.Directory.doesFileExist "exports/students_list.txt"
     assertEqual "Should export students" True fileExists
-    removeFile "students_list.txt"
-    fileExistsAfterRemoval <- System.Directory.doesFileExist "students_list.txt"
+    removeFile "exports/students_list.txt"
+    fileExistsAfterRemoval <- System.Directory.doesFileExist "exports/students_list.txt"
     assertEqual "Should remove students file after testing." False fileExistsAfterRemoval
 
 testExportModules :: Test
 testExportModules = TestCase $ do
     let modules = [Module 1 "Test1" [], Module 2 "Test2" []]
     exportModules modules
-    fileExists <- System.Directory.doesFileExist "modules_list.txt"
+    fileExists <- System.Directory.doesFileExist "exports/modules_list.txt"
     assertEqual "Should export modules" True fileExists
-    removeFile "modules_list.txt"
-    fileExistsAfterRemoval <- System.Directory.doesFileExist "modules_list.txt"
+    removeFile "exports/modules_list.txt"
+    fileExistsAfterRemoval <- System.Directory.doesFileExist "exports/modules_list.txt"
     assertEqual "Should remove modules file after testing." False fileExistsAfterRemoval
+
+
+testAddStudentToModule :: Test
+testAddStudentToModule = TestCase $ do
+    let students = [Student 1 "Test Alice" "Smith" [101, 102], Student 2 "Test Bob" "Johnson" [103]]
+    let modules = [Module 101 "Test1" [1, 2], Module 102 "Test2" [1, 2], Module 103 "Test3" [2]]
+    result <- addStudentToModule 1 103 students modules
+    assertEqual "Should add a student to a module" (Right ([Student 1 "Test Alice" "Smith" [103, 101, 102], Student 2 "Test Bob" "Johnson" [103]], [Module 101 "Test1" [1, 2], Module 102 "Test2" [1, 2], Module 103 "Test3" [1, 2]])) result
+
+testRemoveStudentFromModule :: Test
+testRemoveStudentFromModule = TestCase $ do
+    let students = [Student 1 "Test Alice" "Smith" [101, 102, 103], Student 2 "Test Bob" "Johnson" [103]]
+    let modules = [Module 101 "Test1" [1, 2], Module 102 "Test2" [1, 2], Module 103 "Test3" [1, 2]]
+    result <- removeStudentFromModule 1 103 students modules
+    assertEqual "Should remove a student from a module" (Right ([Student 1 "Test Alice" "Smith" [101, 102], Student 2 "Test Bob" "Johnson" [103]], [Module 101 "Test1" [1, 2], Module 102 "Test2" [1, 2], Module 103 "Test3" [2]])) result
 
 main :: IO ()
 main = do

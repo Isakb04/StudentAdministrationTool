@@ -1,27 +1,33 @@
 module Main (
     main,  -- Export only the main function
     commandSystem,  -- Optionally export more identifiers as needed
+    help,  -- Export help function
     add,  -- Export add function
     remove,  -- Export remove function
     findStudent,  -- Export findStudent function
     findModule,  -- Export findModule function
-    exportData  -- Export exportData function
+    exportData,  -- Export exportData function
+    config  -- Export config function
 ) where
 
 import Lib
 import Data.Maybe (maybeToList)
 import Data.Char (toUpper)
+import System.Environment()
 
 main :: IO ()
 main = do
-    putStrLn "Welcome to the Student and Module Management System!"
+    putStrLn "[Student and Module Management System!]"
     commandSystem
-    help
+    return ()
+
 
 commandSystem :: IO ()
 commandSystem = do
     putStrLn ""
-    putStrLn "Please enter a command:"
+    putStrLn "now in Interface mode"
+    putStrLn ""
+    putStrLn "   [Command options]"
     putStrLn "1: Add Student or Module"
     putStrLn "2: Remove Student or Module"
     putStrLn "3: Find Student"
@@ -29,42 +35,48 @@ commandSystem = do
     putStrLn "5: Export Data"
     putStrLn "0: Exit"
     putStrLn ""
+    putStrLn "Enter command number:"
     cmd <- getLine
     case cmd of
-        "1" -> add
-        "2" -> remove
-        "3" -> findStudent
-        "4" -> findModule
-        "5" -> exportData
-        "0" -> putStrLn "Exiting the command system."
+        "1" -> add >> commandSystem
+        "2" -> remove >> commandSystem
+        "3" -> findStudent >> commandSystem
+        "4" -> findModule >> commandSystem
+        "5" -> exportData >> commandSystem
+        "0" -> do
+            putStrLn ""
+            putStrLn "Exiting the command system, now in default mode."
+            putStrLn ""
         _ -> do
             putStrLn "Invalid command. Please try again."
             commandSystem
 
 help :: IO ()
 help = do
-    putStrLn "Commands:"
+    putStrLn "               [Commands]"
     putStrLn "commandSystem: Enter the command system"
-    putStrLn "          add: Add Student or Module"
-    putStrLn "       remove: Remove Student or Module"
-    putStrLn "  findStudent: Find Student"
-    putStrLn "   findModule: Find Module"
-    putStrLn "       export: Export Data"
+    putStrLn "          add: addStudent <firstName> <lastName> <modules> sepertaed by comma: Adds a new student."
+    putStrLn "               addModule <moduleName>: Adds a new module."
+    putStrLn "       remove: removeStudent <studentId>: Removes a student by ID."
+    putStrLn "               removeModule <moduleId>: Removes a module by ID."
+    putStrLn "       config: Add <studentId> <moduleId>: Adds a student to a module."
+    putStrLn "               Remove <studentId> <moduleId>: Removes a student from a module."
+    putStrLn "  findStudent: findStudent <info>: Finds a student by first name, last name, or ID."
+    putStrLn "   findModule: findModule <info>: Finds a module by name or ID."
+    putStrLn "       export: exportStudents <Students>: Exports the list of students to the specified file."
+    putStrLn "               exportModules <Modules>: Exports the list of modules to the specified file."
     putStrLn "          :q : Exit"
     putStrLn ""
     
 
 add :: IO ()
 add = do
-    putStrLn "Please enter the type of entity to add (Student or Module) **Case Sensitive**:"
+    putStrLn "[add new student or module]"
     entityType <- getLine
-    case entityType of
+    case (toUpper (head entityType) : tail entityType) of
         "Student" -> do
-            putStrLn "Enter the first name of the student:"
             fName <- getLine
-            putStrLn "Enter the last name of the student:"
             lName <- getLine
-            putStrLn "Enter the enrolled modules (comma-separated module IDs):"
             modulesInput <- getLine
             let moduleIds = map read $ words $ map (\c -> if c == ',' then ' ' else c) modulesInput
             eitherModules <- loadModules
@@ -87,7 +99,6 @@ add = do
                                 else putStrLn "Student addition cancelled."
                 _ -> putStrLn "Error loading data."
         "Module" -> do
-            putStrLn "Enter the name of the module:"
             mName <- getLine
             eitherModules <- loadModules
             case eitherModules of
@@ -105,16 +116,16 @@ add = do
                                 else putStrLn "Module addition cancelled."
                 Left err -> putStrLn err
         _ -> do
-            putStrLn "Invalid input. Please type 'Student' or 'Module'."
-            add
+            putStrLn "Invalid arguments. Please refer to the README or help command."
+            
+
 
 remove :: IO ()
 remove = do
-    putStrLn "Please enter the type of entity to remove (Student or Module) **Case Sensitive**:"
+    putStrLn "[remove student or module]"
     entityType <- getLine
-    case entityType of
+    case (toUpper (head entityType) : tail entityType) of
         "Student" -> do
-            putStrLn "Enter the student ID to remove:"
             sIdInput <- getLine
             let sId = read sIdInput
             eitherModules <- loadModules
@@ -135,7 +146,6 @@ remove = do
                                 else putStrLn "Student removal cancelled."
                 _ -> putStrLn "Error loading data."
         "Module" -> do
-            putStrLn "Enter the module ID to remove:"
             mIdInput <- getLine
             let mId = read mIdInput
             eitherModules <- loadModules
@@ -156,12 +166,65 @@ remove = do
                                 else putStrLn "Module removal cancelled."
                 _ -> putStrLn "Error loading data."
         _ -> do
-            putStrLn "Invalid input. Please type 'Student' or 'Module'."
-            remove
+            putStrLn "Invalid arguments. Please refer to the README or help command."
+            
+
+
+config :: IO ()
+config = do
+    putStrLn "[add or remove student from module]"
+    entityType <- getLine
+    case (toUpper (head entityType) : tail entityType) of
+        "Add" -> do
+            sIdInput <- getLine
+            let sId = read sIdInput
+            mIdInput <- getLine
+            let mId = read mIdInput
+            eitherModules <- loadModules
+            eitherStudents <- loadStudents
+            case (eitherModules, eitherStudents) of
+                (Right modules, Right students) -> do
+                    result <- addStudentToModule sId mId students modules
+                    case result of
+                        Left err -> putStrLn err
+                        Right (updatedStudents, updatedModules) -> do
+                            putStrLn "Are you sure you want to add this student to the module? (Y/N)"
+                            confirmation <- getLine
+                            if confirmation == "Y" || confirmation == "y"
+                                then do
+                                    saveStudents updatedStudents
+                                    saveModules updatedModules
+                                    putStrLn "Student added to module successfully!"
+                                else putStrLn "Student addition to module cancelled."
+                _ -> putStrLn "Error loading data."
+        "Remove" -> do
+            sIdInput <- getLine
+            let sId = read sIdInput
+            mIdInput <- getLine
+            let mId = read mIdInput
+            eitherModules <- loadModules
+            eitherStudents <- loadStudents
+            case (eitherModules, eitherStudents) of
+                (Right modules, Right students) -> do
+                    result <- removeStudentFromModule sId mId students modules
+                    case result of
+                        Left err -> putStrLn err
+                        Right (updatedStudents, updatedModules) -> do
+                            putStrLn "Are you sure you want to remove this student from the module? (Y/N)"
+                            confirmation <- getLine
+                            if confirmation == "Y" || confirmation == "y"
+                                then do
+                                    saveStudents updatedStudents
+                                    saveModules updatedModules
+                                    putStrLn "Student removed from module successfully!"
+                                else putStrLn "Student removal from module cancelled."
+                _ -> putStrLn "Error loading data."
+        _ -> do
+            putStrLn "Invalid arguments. Please refer to the README or help command."
 
 findStudent :: IO ()
 findStudent = do
-    putStrLn "Enter the student's first name, last name or ID:"
+    putStrLn "[Find Student]"
     name <- getLine
     eitherStudents <- loadStudents
     case eitherStudents of
@@ -182,7 +245,7 @@ findStudent = do
 
 findModule :: IO ()
 findModule = do
-    putStrLn "Enter the module name or ID:"
+    putStrLn "[Find Module]"
     input <- getLine
     eitherModules <- loadModules
     case eitherModules of
@@ -199,9 +262,9 @@ findModule = do
 
 exportData :: IO ()
 exportData = do
-    putStrLn "Do you want to export students or modules? (Type 'Students' or 'Modules') **Case Sensitive**:"
+    putStrLn "[Export Data]"
     entityType <- getLine
-    case entityType of
+    case (toUpper (head entityType) : tail entityType) of
         "Students" -> do
             eitherStudents <- loadStudents
             case eitherStudents of
@@ -217,5 +280,4 @@ exportData = do
                     putStrLn "Modules exported successfully."
                 Left err -> putStrLn err
         _ -> do
-            putStrLn "Invalid input. Please type 'Students' or 'Modules'."
-            exportData
+            putStrLn "Invalid input. Please refer to the README or help command."

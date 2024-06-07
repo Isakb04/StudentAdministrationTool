@@ -20,6 +20,8 @@ module Lib (
     removeModule,
     exportStudents,
     exportModules,
+    addStudentToModule,
+    removeStudentFromModule
 ) where
 
 import qualified Data.ByteString.Lazy as B
@@ -27,6 +29,7 @@ import Data.Aeson (FromJSON, ToJSON, eitherDecode)
 import Data.Aeson.Encode.Pretty (encodePretty)
 import GHC.Generics (Generic)
 import Data.List (find, delete)
+import System.Directory (createDirectoryIfMissing)
 
 data Student = Student
     { studentId :: Int
@@ -114,14 +117,40 @@ removeModule mId modules students = do
     where
         updatedStudents = map (\s -> s { enrolledModules = filter (/= mId) (enrolledModules s) }) students
 
+addStudentToModule :: Int -> Int -> [Student] -> [Module] -> IO (Either String ([Student], [Module]))
+addStudentToModule sId mId students modules = do
+    case findStudentById sId students of
+        Just _ -> 
+            case findModuleById mId modules of
+                Just _ -> return $ Right (updatedStudents, updatedModules)            
+                Nothing -> return $ Left "No module found with given ID"
+        Nothing -> return $ Left "No student found with given ID"
+    where
+        updatedStudents = map (\s -> if studentId s == sId then s { enrolledModules = mId : enrolledModules s } else s) students
+        updatedModules = map (\m -> if moduleId m == mId then m { enrolledStudents = sId : enrolledStudents m } else m) modules
+
+removeStudentFromModule :: Int -> Int -> [Student] -> [Module] -> IO (Either String ([Student], [Module]))
+removeStudentFromModule sId mId students modules = do
+    case findStudentById sId students of
+        Just _ -> 
+            case findModuleById mId modules of
+                Just _ -> return $ Right (updatedStudents, updatedModules)
+                Nothing -> return $ Left "No module found with given ID"
+        Nothing -> return $ Left "No student found with given ID"
+    where
+        updatedStudents = map (\s -> if studentId s == sId then s { enrolledModules = filter (/= mId) (enrolledModules s) } else s) students
+        updatedModules = map (\m -> if moduleId m == mId then m { enrolledStudents = filter (/= sId) (enrolledStudents m) } else m) modules
+        
 exportStudents :: [Student] -> IO ()
 exportStudents students = do
     let content = unlines $ map (\s -> "Student ID: " ++ show (studentId s) ++ ", Name: " ++ firstName s ++ " " ++ lastName s ++ ", Modules: " ++ show (enrolledModules s)) students
-    writeFile "students_list.txt" content
+    createDirectoryIfMissing True "exports"
+    writeFile "exports/students_list.txt" content
     putStrLn "Students exported successfully."
 
 exportModules :: [Module] -> IO ()
 exportModules modules = do
     let content = unlines $ map (\m -> "Module ID: " ++ show (moduleId m) ++ ", Name: " ++ moduleName m ++ ", Students: " ++ show (enrolledStudents m)) modules
-    writeFile "modules_list.txt" content
+    createDirectoryIfMissing True "exports"
+    writeFile "exports/modules_list.txt" content
     putStrLn "Modules exported successfully."
