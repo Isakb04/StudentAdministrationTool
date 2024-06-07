@@ -66,8 +66,8 @@ You will be presented with a command-line interface where you can perform variou
 **Keep in minds:**
 
 **Confirmation of modification to JSON**:
-To finish a command at the end type “Y” or “y” to run the full command anything else will cancel, it does not ask for input so it's still non-interactive, more for saving accidental additions.
-
+To finish a command at the  type “Y” or “y” to run the full command anything else will cancel, it does not ask for input so it's still non-interactive, more for saving accidental additions.
+end
 
 **toUpper (Head)**: all FirstName, LastName, modules and choosing the student or module which you want to work with will capitalize the first letter getting rid of errors in the searching and modification of JSON data.
 
