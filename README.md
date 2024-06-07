@@ -44,7 +44,7 @@ The Student and Module Management System is a Haskell-based application that all
 1. Clone the repository:
     ```sh
     git clone https://github.com/Isakb04/BS2220FunctionalProgramming.git
-    cd student-module-management
+    cd BS2220FunctionalProgramming
     ```
 
 2. Install dependencies and build the project:
@@ -148,7 +148,6 @@ help
 
 **Example Code**
 ```sh
-Example Command
 Add -> *Keypress ENTER*
 Student -> *Keypress ENTER *
 Joe -> *Keypress ENTER *
@@ -198,4 +197,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Isak Jonsson
 
 ## Acknowledgments
-- Reuben Shaw
+- Reuben Shaw - assisted with the importation of JSON data
